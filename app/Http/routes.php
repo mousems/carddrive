@@ -12,5 +12,43 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    if (Session::has('access_token')) {
+        return redirect('/home');
+    }else{
+        $client = new PulkitJalan\Google\Client(Config::get('google'));
+        $googleClient = $client->getclient();
+        $auth_url = $googleClient->createAuthUrl();
+        return view('welcome', [
+            "url"=>$auth_url
+        ]);
+    }
+
+});
+
+
+Route::get('/auth_callback', function () {
+    $client = new PulkitJalan\Google\Client(Config::get('google'));
+    $googleClient = $client->getclient();
+    $auth_url = $googleClient->createAuthUrl();
+    try {
+        $accessToken_pack = $googleClient->authenticate(Request::input('code'));
+
+		Session::Set("access_token", $accessToken_pack);
+        return redirect('/home');
+
+
+    } catch (Exception $e) {
+        return view('welcome', [
+            "error"=>"Oops! Something wrong.",
+            "url"=>$auth_url
+        ]);
+    }
+});
+
+
+Route::get('/home', 'CardDriveController@home');
+
+Route::get('/logout', function(){
+    Session::flush();
+    return redirect('/');
 });

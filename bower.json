@@ -1,0 +1,8 @@
+{
+  "name": "CardDrive",
+  "dependencies": {
+    "jquery": "~1.10.1",
+    "jquery-ui": "~1.10.1",
+    "moment": "~2.10.6"
+  }
+}

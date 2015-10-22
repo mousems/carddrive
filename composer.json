@@ -7,7 +7,11 @@
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.1.*",
-        "google/apiclient": "1.0.*@beta"
+        "google/apiclient": "1.0.*@beta",
+        "twbs/bootstrap": "^3.3",
+        "pulkitjalan/google-apiclient": "^2.0",
+        "barryvdh/laravel-debugbar": "^2.0"
+
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
@@ -17,7 +21,8 @@
     },
     "autoload": {
         "classmap": [
-            "database"
+            "database",
+            "vendor/google/apiclient/src/Google"
         ],
         "psr-4": {
             "App\\": "app/"
