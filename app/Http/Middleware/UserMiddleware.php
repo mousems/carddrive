@@ -26,8 +26,9 @@ class UserMiddleware
             $this->googleClient->setAccessToken(Session::get('access_token'));
 
     		if ($this->googleClient->isAccessTokenExpired()) {
-    			$this->googleClient->refreshToken($client->getRefreshToken());
-    			Session::set("access_token",$this->googleClient->getAccessToken());
+    			// $this->googleClient->refreshToken($client->getRefreshToken());
+    			// Session::set("access_token",$this->googleClient->getAccessToken());
+                return redirect('/logout');
     		}
         }else{
             return redirect('/');

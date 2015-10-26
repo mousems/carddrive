@@ -10,7 +10,8 @@
         "google/apiclient": "1.0.*@beta",
         "twbs/bootstrap": "^3.3",
         "pulkitjalan/google-apiclient": "^2.0",
-        "barryvdh/laravel-debugbar": "^2.0"
+        "barryvdh/laravel-debugbar": "^2.0",
+        "jeroendesloovere/vcard": "1.2.*"
 
     },
     "require-dev": {

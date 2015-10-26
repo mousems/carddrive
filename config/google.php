@@ -23,7 +23,7 @@ return [
     // 'redirect_uri'    => 'http://carddrive.mousems.me/auth_callback'
     'scopes'          => ['https://www.googleapis.com/auth/drive.appfolder'],
     'access_type'     => 'online',
-    'approval_prompt' => 'auto',
+    'approval_prompt' => 'force',
 
     /*
     |----------------------------------------------------------------------------

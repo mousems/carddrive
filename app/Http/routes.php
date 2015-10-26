@@ -52,3 +52,14 @@ Route::get('/logout', function(){
     Session::flush();
     return redirect('/');
 });
+
+Route::get('/api/appfolder/info', 'GDController@appfolder_info');
+
+Route::get('/api/appfolder/createfile', 'GDController@appfolder_createfile');
+
+Route::get('/api/appfolder/showall', 'GDController@appfolder_list');
+Route::get('/api/file/{fileID}', 'GDController@getFileByID');
+
+
+Route::get('/api/vcard/get', 'GDController@getvcard');
+Route::get('/api/contact/me', 'GDController@contact_me');
