@@ -3,8 +3,6 @@
     <head>
         <title>Card Drive</title>
 
-        <link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
-
         <!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
         <!-- Optional theme -->
@@ -24,7 +22,6 @@
                 width: 100%;
                 display: table;
                 font-weight: 100;
-                font-family: 'Lato';
             }
 
             .container {
@@ -59,7 +56,7 @@
         <div class="col-xs-12 col-sm-offset-3 col-sm-6">
             <div class="panel panel-default">
                 <div class="panel-heading c-list">
-                    <span class="title">Contacts</span>
+                    <span class="title">CardDrive</span>
                     <ul class="pull-right c-controls"  style="display: none;">
                         <li><a href="#cant-do-all-the-work-for-you" data-toggle="tooltip" data-placement="top" title="Add Contact"><i class="glyphicon glyphicon-plus"></i></a></li>
                         <li><a href="#" class="hide-search" data-command="toggle-search" data-toggle="tooltip" data-placement="top" title="Toggle Search"><i class="fa fa-ellipsis-v"></i></a></li>
@@ -85,7 +82,7 @@
                         </div>
                         <div class="clearfix"></div>
                     </li>
-                    <li class="list-group-item" id="contact123">
+                    <!-- <li class="list-group-item" id="contact123">
                         <div class="col-xs-12 col-sm-2">
                             <img src="http://api.randomuser.me/portraits/men/49.jpg" alt="Scott Stevens" class="img-responsive img-circle person-img">
                         </div>
@@ -93,7 +90,7 @@
                             <span class="name">Scott Stevens</span><br>
                         </div>
                         <div class="clearfix"></div>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
@@ -105,29 +102,86 @@
               <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
               <h4 class="modal-title">補齊您的資料</h4>
             </div>
-            <form class="form-horizontal">
-              <div class="form-group">
-                <label class="col-sm-2 control-label">Name</label>
-                <div class="col-sm-4">
-                  <input type="input" class="form-control" id="formLastName" placeholder="Last Name">
-                </div>
-                  <label class="col-sm-2 control-label">Last Name</label>
-                  <div class="col-sm-4">
-                    <input type="input" class="form-control" id="formFirstName" placeholder="First Naem">
+            <div class="modal-body">
+
+              <form class="form-horizontal" action="/home/save" method="post">
+                <label class="control-label">Name</label>
+                <div class="form-group">
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formLastName" name="formLastName" placeholder="Last Name">
                   </div>
-              </div>
-             <div class="form-group">
-               <label class="col-sm-2 control-label">Phone</label>
-               <div class="col-sm-4">
-                 <input type="input" class="form-control" id="formPhone" placeholder="Phone">
-               </div>
-            </div>
-              <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                  <button type="submit" class="btn btn-default">Sign in</button>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formFirstName" name="formFirstName" placeholder="First Name">
+                  </div>
                 </div>
-              </div>
-            </form>
+                <label class="control-label">Company</label>
+                <div class="form-group">
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formCompany" name="formCompany" placeholder="Company Name">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formTitle" name="formTitle" placeholder="Job Title">
+                  </div>
+                </div>
+                <label class="control-label">Phone</label>
+                <div class="form-group">
+                  <div class="col-sm-4">
+                    <select class="form-control" id="formPhoneType" name="formPhoneType">
+                      <option value="Mobile">Mobile</option>
+                      <option value="Home">Home</option>
+                      <option value="Work">Work</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formPhone" name="formPhone" placeholder="Phone">
+                  </div>
+                </div>
+                  <label class="control-label">E-mail</label>
+                  <div class="form-group">
+                    <div class="col-sm-4">
+                      <select class="form-control" id="formEmailType" name="formEmailType">
+                        <option value="Main">Main</option>
+                        <option value="Work">Work</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <input type="input" class="form-control" id="formMail" name="formEmail" placeholder="E-mail">
+                    </div>
+                  </div>
+                <label class="control-label">Address</label>
+                <div class="form-group">
+                  <div class="col-sm-3">
+                    <select class="form-control" id="formAddressType" name="formAddressType">
+                      <option value="Home">Home</option>
+                      <option value="Work">Work</option>
+                      <option value="Postal">Postal</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formAddressCountry" name="formAddressCountry" placeholder="Country">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formAddressZIP" name="formAddressZIP" placeholder="ZIP">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formAddressCity" name="formAddressCity" placeholder="Country/City">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-4">
+                    <input type="input" class="form-control" id="formAddressTownship" name="formAddressTownship" placeholder="Township/District">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formAddressStreet" name="formAddressStreet" placeholder="Street">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-3">
+                    <button type="submit" class="btn btn-default">save</button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
     </div>
@@ -143,8 +197,11 @@
             success: function(resp) {
                 if (resp.error=="notfound") {
                     $("#form").modal("show");
-                }else{
-
+                }else if (resp.error=="fail") {
+                    alert("讀取自己的資料失敗！")
+                }else if (resp.error==null) {
+                    new_contact(resp.myid, "http://api.randomuser.me/portraits/men/49.jpg", resp.myname);
+                    $("#nocontacts").remove();
                 }
             }
         });
@@ -153,8 +210,14 @@
         });
     });
     function new_contact(contact_id, imgurl, name) {
-        $("#contact-list").append('<li class="list-group-item" id="contact'+contact_id+'"><div class="col-xs-12 col-sm-2"><img src="'+imgurl+'" class="img-responsive img-circle person-img"></div><div class="col-xs-12 col-sm-10"><span class="name">'+name+'</span><br></div><div class="clearfix"></div></li>');
+        $("#contact-list").append('<li class="list-group-item" id="contact'+contact_id+'"><div class="col-xs-12 col-sm-2"><img src="'+imgurl+'" class="img-responsive img-circle person-img"></div><div class="col-xs-12 col-sm-9"><span class="name">'+name+'</span></span><div class="col-sm-offset-11 col-sm-1"><span class="icon'+contact_id+' glyphicon glyphicon-chevron-right" style="cursor: pointer;"></div><br></div><div class="clearfix"></div></li>');
+        $(".icon"+contact_id).on("click",function(event) {
+            open_contact(contact_id);
+        });
     };
+    function open_contact(contact_id){
+        console.log('hi '+contact_id);
+    }
     </script>
     </body>
 </html>

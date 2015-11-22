@@ -53,11 +53,18 @@ Route::get('/logout', function(){
     return redirect('/');
 });
 
-Route::get('/api/appfolder/info', 'GDController@appfolder_info');
+Route::post('/home/save', 'GDController@first_save');
 
+Route::get('/api/appfolder/info', 'GDController@appfolder_info');
+Route::get('/api/read_cache', 'GDController@read_cache');
 Route::get('/api/appfolder/createfile', 'GDController@appfolder_createfile');
 
+Route::get('/api/appfolder/createcache', 'GDController@appfolder_createcache');
+
+
 Route::get('/api/appfolder/showall', 'GDController@appfolder_list');
+Route::get('/api/appfolder/deleteall', 'GDController@appfolder_deleteall');
+
 Route::get('/api/file/{fileID}', 'GDController@getFileByID');
 
 
