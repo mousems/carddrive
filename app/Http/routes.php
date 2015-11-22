@@ -54,6 +54,8 @@ Route::get('/logout', function(){
 });
 
 Route::post('/home/save', 'GDController@first_save');
+Route::post('/home/update', 'GDController@update');
+Route::post('/home/share', 'GDController@share');
 
 Route::get('/api/appfolder/info', 'GDController@appfolder_info');
 Route::get('/api/read_cache', 'GDController@read_cache');
@@ -69,4 +71,6 @@ Route::get('/api/file/{fileID}', 'GDController@getFileByID');
 
 
 Route::get('/api/vcard/get', 'GDController@getvcard');
+
 Route::get('/api/contact/me', 'GDController@contact_me');
+Route::get('/api/contact_data/{contact_id}', 'GDController@contact_data');

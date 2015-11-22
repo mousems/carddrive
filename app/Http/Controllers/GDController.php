@@ -33,36 +33,6 @@ class GDController extends Controller
         return response()->json($appfolder_info);
     }
 
-    public function getvcard(){
-
-        // $appfolder_info = $this->GSDrive->files->get(Session::get('appfolder_id'));
-        //
-        // return response()->json($appfolder_info);
-
-        $vcard = new VCard();
-
-        $lastname = 'Desloovere';
-        $firstname = 'Jeroen';
-        $additional = '';
-        $prefix = '';
-        $suffix = '';
-
-        // add personal data
-        $vcard->addName($lastname, $firstname, $additional, $prefix, $suffix);
-
-        // add work data
-        $vcard->addCompany('Siesqo');
-        $vcard->addJobtitle('Web Developer');
-        $vcard->addEmail('info@jeroendesloovere.be');
-        $vcard->addPhoneNumber(1234121212, 'PREF;WORK');
-        $vcard->addPhoneNumber(123456789, 'WORK');
-        $vcard->addAddress(null, null, 'street', 'worktown', null, 'workpostcode', 'Belgium');
-        $vcard->addURL('http://www.jeroendesloovere.be');
-
-        // return vcard as a string
-        return $vcard->getOutput();
-    }
-
     public function appfolder_createfile($filename, $data, $mimeType='text/plain'){
         $new_file = new \Google_Service_Drive_DriveFile();
 		$new_file->setTitle($filename);
@@ -78,6 +48,28 @@ class GDController extends Controller
 		  )
 		);
         return Response()->json($this->downloadFile($result));
+    }
+    public function appfolder_updatefile($fileid, $data){
+
+        $additionalParams = array(
+            'newRevision' => FALSE,
+            'data' => $data,
+            'mimeType' => 'text/plain',
+            'uploadType' => 'media'
+        );
+
+        try {
+            $updatedFile = $this->GSDrive->files->update(
+                $fileid,
+                $this->GSDrive->files->get($fileid),
+                $additionalParams
+            );
+        } catch (Exception $e) {
+
+        }
+
+
+
     }
 
     public function appfolder_createcache(){
@@ -117,7 +109,7 @@ class GDController extends Controller
 
         $parameters = [
             "pageToken"=>null,
-            "q"=>"title='CardDrive_cache'"
+            "q"=>"title contains 'CardDrive_".Session::get('email_sha')."_Cache'"
         ];
         $children = $this->GSDrive->children->listChildren(Session::get('appfolder_id'), $parameters);
         $return = [];
@@ -207,7 +199,22 @@ class GDController extends Controller
         return Response()->json(["myname"=>$myname,"myid"=>Session::get('email_sha')]);
 
     }
-
+    public function contact_data($contact_id){
+        $parameters['q'] = "title contains 'CardDrive_".$contact_id."_' and title!='CardDrive_".$contact_id."_Cache'";
+        $children = $this->GSDrive->children->listChildren(Session::get('appfolder_id'), $parameters);
+        $MyFilesList = [];
+        foreach ($children->getItems() as $key => $child) {
+            $MyFilesList[] = $child->getId();
+        }
+        $res_arr = [];
+        foreach ($MyFilesList as $MyFilesKey => $MyFileIDs) {
+            $file_youwant = $this->GSDrive->files->get($MyFileIDs);
+            $title = $file_youwant->getTitle();
+            $data = $this->downloadFile($file_youwant);
+            $res_arr[] = ["title"=>str_replace("CardDrive_".$contact_id."_","",$title) , "data"=>$data];
+        }
+        return Response()->json($res_arr);
+    }
     public function getContentByTitle($title){
         $parameters['q'] = "title contains '".$title."'";
         $children = $this->GSDrive->children->listChildren(Session::get('appfolder_id'), $parameters);
@@ -217,9 +224,135 @@ class GDController extends Controller
         }else{
             return null;
         }
-
     }
     public function first_save(Request $request){
+        $email_sha = Session::get('email_sha');
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_LastName",
+            $request->input('formLastName')
+        );
+
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_FirstName",
+            $request->input('formFirstName')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_Company",
+            $request->input('formCompany')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_Title",
+            $request->input('formTitle')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_Phone_".$request->input('formPhoneType'),
+            $request->input('formPhone')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_Email_".$request->input('formEmailType'),
+            $request->input('formEmail')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_AddressCountry_".$request->input('formAddressType'),
+            $request->input('formAddressCountry')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_AddressZIP_".$request->input('formAddressType'),
+            $request->input('formAddressZIP')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_AddressCity_".$request->input('formAddressType'),
+            $request->input('formAddressCity')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_AddressTownship_".$request->input('formAddressType'),
+            $request->input('formAddressTownship')
+        );
+        $this->appfolder_createfile(
+            "CardDrive_".$email_sha."_AddressStreet_".$request->input('formAddressType'),
+            $request->input('formAddressStreet')
+        );
+
+        $this->appfolder_createfile(
+            "CardDrive_".Session::get('email_sha')."_Cache",
+            Response()->json(
+                [
+                    "FT" => [],
+                    "TF" => [],
+                    "EN" => [
+                            Session::get('email_sha')=>$request->input('formFirstName')." ".$request->input('formLastName')
+                    ]
+                ]
+            )
+        );
+        return redirect('/home');
+    }
+    public function update(Request $request){
+        $cache = json_decode($this->read_cache());
+        $email_sha = Session::get('email_sha');
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_LastName"},
+            $request->input('formLastName')
+        );
+
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_FirstName"},
+            $request->input('formFirstName')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_Company"},
+            $request->input('formCompany')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_Title"},
+            $request->input('formTitle')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_Phone_".$request->input('formPhoneType')},
+            $request->input('formPhone')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_Email_".$request->input('formEmailType')},
+            $request->input('formEmail')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_AddressCountry_".$request->input('formAddressType')},
+            $request->input('formAddressCountry')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_AddressZIP_".$request->input('formAddressType')},
+            $request->input('formAddressZIP')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_AddressCity_".$request->input('formAddressType')},
+            $request->input('formAddressCity')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_AddressTownship_".$request->input('formAddressType')},
+            $request->input('formAddressTownship')
+        );
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".$email_sha."_AddressStreet_".$request->input('formAddressType')},
+            $request->input('formAddressStreet')
+        );
+
+        $this->appfolder_updatefile(
+            $cache->TF->{"CardDrive_".Session::get('email_sha')."_Cache"},
+            Response()->json(
+                [
+                    "FT" => [],
+                    "TF" => [],
+                    "EN" => [
+                            Session::get('email_sha')=>$request->input('formFirstName')." ".$request->input('formLastName')
+                    ]
+                ]
+            )
+        );
+        return redirect('/home');
+    }
+    public function share(Request $request){
+        $cache = json_decode($this->read_cache());
+
         $email_sha = Session::get('email_sha');
         $this->appfolder_createfile(
             "CardDrive_".$email_sha."_LastName",

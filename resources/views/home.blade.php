@@ -95,7 +95,7 @@
             </div>
         </div>
 	</div>
-    <div class="modal" id="form" data-backdrop="static">
+    <div class="modal" id="form_new" data-backdrop="static">
     	<div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -145,7 +145,187 @@
                       </select>
                     </div>
                     <div class="col-sm-6">
-                      <input type="input" class="form-control" id="formMail" name="formEmail" placeholder="E-mail">
+                      <input type="input" class="form-control" id="formEmail" name="formEmail" placeholder="E-mail">
+                    </div>
+                  </div>
+                <label class="control-label">Address</label>
+                <div class="form-group">
+                  <div class="col-sm-3">
+                    <select class="form-control" id="formAddressType" name="formAddressType">
+                      <option value="Home">Home</option>
+                      <option value="Work">Work</option>
+                      <option value="Postal">Postal</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formAddressCountry" name="formAddressCountry" placeholder="Country">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formAddressZIP" name="formAddressZIP" placeholder="ZIP">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formAddressCity" name="formAddressCity" placeholder="Country/City">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-4">
+                    <input type="input" class="form-control" id="formAddressTownship" name="formAddressTownship" placeholder="Township/District">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formAddressStreet" name="formAddressStreet" placeholder="Street">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-3">
+                    <button type="submit" class="btn btn-default">save</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="modal" id="form_update" data-backdrop="static">
+    	<div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h4 class="modal-title">About Me</h4>
+            </div>
+            <div class="modal-body">
+
+              <form class="form-horizontal" action="/home/update" method="post">
+                <label class="control-label">Name</label>
+                <div class="form-group">
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formOldLastName" name="formLastName" placeholder="Last Name">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formOldFirstName" name="formFirstName" placeholder="First Name">
+                  </div>
+                </div>
+                <label class="control-label">Company</label>
+                <div class="form-group">
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formOldCompany" name="formCompany" placeholder="Company Name">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formOldTitle" name="formTitle" placeholder="Job Title">
+                  </div>
+                </div>
+                <label class="control-label">Phone</label>
+                <div class="form-group">
+                  <div class="col-sm-4">
+                    <select class="form-control" id="formOldPhoneType" name="formPhoneType">
+                      <option value="Mobile">Mobile</option>
+                      <option value="Home">Home</option>
+                      <option value="Work">Work</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formOldPhone" name="formPhone" placeholder="Phone">
+                  </div>
+                </div>
+                  <label class="control-label">E-mail</label>
+                  <div class="form-group">
+                    <div class="col-sm-4">
+                      <select class="form-control" id="formOldEmailType" name="formEmailType">
+                        <option value="Main">Main</option>
+                        <option value="Work">Work</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <input type="input" class="form-control" id="formOldEmail" name="formEmail" placeholder="E-mail">
+                    </div>
+                  </div>
+                <label class="control-label">Address</label>
+                <div class="form-group">
+                  <div class="col-sm-3">
+                    <select class="form-control" id="formOldAddressType" name="formAddressType">
+                      <option value="Home">Home</option>
+                      <option value="Work">Work</option>
+                      <option value="Postal">Postal</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formOldAddressCountry" name="formAddressCountry" placeholder="Country">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formOldAddressZIP" name="formAddressZIP" placeholder="ZIP">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="input" class="form-control" id="formOldAddressCity" name="formAddressCity" placeholder="Country/City">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-4">
+                    <input type="input" class="form-control" id="formOldAddressTownship" name="formAddressTownship" placeholder="Township/District">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formOldAddressStreet" name="formAddressStreet" placeholder="Street">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-3">
+                    <button type="submit" class="btn btn-default">save</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="modal" id="form_share" data-backdrop="static">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h4 class="modal-title">共享資料</h4>
+            </div>
+            <div class="modal-body">
+
+              <form class="form-horizontal" action="/home/share" method="post">
+                <label class="control-label">Name</label>
+                <div class="form-group">
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formLastName" name="formLastName" placeholder="Last Name">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formFirstName" name="formFirstName" placeholder="First Name">
+                  </div>
+                </div>
+                <label class="control-label">Company</label>
+                <div class="form-group">
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formCompany" name="formCompany" placeholder="Company Name">
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formTitle" name="formTitle" placeholder="Job Title">
+                  </div>
+                </div>
+                <label class="control-label">Phone</label>
+                <div class="form-group">
+                  <div class="col-sm-4">
+                    <select class="form-control" id="formPhoneType" name="formPhoneType">
+                      <option value="Mobile">Mobile</option>
+                      <option value="Home">Home</option>
+                      <option value="Work">Work</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="input" class="form-control" id="formPhone" name="formPhone" placeholder="Phone">
+                  </div>
+                </div>
+                  <label class="control-label">E-mail</label>
+                  <div class="form-group">
+                    <div class="col-sm-4">
+                      <select class="form-control" id="formEmailType" name="formEmailType">
+                        <option value="Main">Main</option>
+                        <option value="Work">Work</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-6">
+                      <input type="input" class="form-control" id="formEmail" name="formEmail" placeholder="E-mail">
                     </div>
                   </div>
                 <label class="control-label">Address</label>
@@ -196,7 +376,7 @@
             method: 'GET',
             success: function(resp) {
                 if (resp.error=="notfound") {
-                    $("#form").modal("show");
+                    $("#form_new").modal("show");
                 }else if (resp.error=="fail") {
                     alert("讀取自己的資料失敗！")
                 }else if (resp.error==null) {
@@ -204,9 +384,6 @@
                     $("#nocontacts").remove();
                 }
             }
-        });
-        $("#contact123").on("click","li", function(event) {
-            console.log('you cick 123');
         });
     });
     function new_contact(contact_id, imgurl, name) {
@@ -216,7 +393,38 @@
         });
     };
     function open_contact(contact_id){
-        console.log('hi '+contact_id);
+        $("#form_update").modal("show");
+        $.ajax({
+            url: '/api/contact_data/'+contact_id,
+            method: 'GET',
+            success: function(resp) {
+                for (var resp_key in resp) {
+                    var r_data = resp[resp_key].data;
+                    var r_title = resp[resp_key].title;
+                    if (r_title.match(/(.+)_(.+)/)) {
+                        r_title_matches = r_title.match(/(.+)_(.+)/);
+                        r_title_column = r_title_matches[1];
+                        r_title_type = r_title_matches[2];
+                    }else{
+                        r_title_column = r_title;
+                    }
+                    if (r_title.match(/Address(.+)_(.+)/)) {
+                        r_title_Addr_type = r_title.match(/Address(.+)_(.+)/);
+                        $("#formOldAddressType").val(r_title_Addr_type[2]);
+                    }else if (r_title.match(/Email_(.+)/)) {
+                        r_title_Addr_type = r_title.match(/Email_(.+)/);
+                        $("#formOldEmailType").val(r_title_Addr_type[1]);
+                    }else if (r_title.match(/Phone_(.+)/)) {
+                        r_title_Addr_type = r_title.match(/Phone_(.+)/);
+                        $("#formOldPhoneType").val(r_title_Addr_type[1]);
+                    }
+                    $("#formOld"+r_title_column).val(r_data);
+                }
+            }
+        });
+        $(".icon"+contact_id).on("click",function(event) {
+            open_contact(contact_id);
+        });
     }
     </script>
     </body>
