@@ -65,6 +65,7 @@ Route::get('/api/appfolder/createcache', 'GDController@appfolder_createcache');
 
 
 Route::get('/api/appfolder/showall', 'GDController@appfolder_list');
+Route::get('/api/appfolder/sharewithme', 'GDController@appfolder_sharewithme');
 Route::get('/api/appfolder/deleteall', 'GDController@appfolder_deleteall');
 
 Route::get('/api/file/{fileID}', 'GDController@getFileByID');
@@ -74,3 +75,6 @@ Route::get('/api/vcard/get', 'GDController@getvcard');
 
 Route::get('/api/contact/me', 'GDController@contact_me');
 Route::get('/api/contact_data/{contact_id}', 'GDController@contact_data');
+
+Route::get('/api/contact/accept/{contact_id}', 'GDController@contact_accept');
+Route::get('/api/contact/reject/{contact_id}', 'GDController@contact_reject');

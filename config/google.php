@@ -21,7 +21,8 @@ return [
     'client_secret'   => 'rfE3U0JJiVEv5f5KMKr1rand',
     'redirect_uri'    => 'http://localhost:8000/auth_callback',
     // 'redirect_uri'    => 'http://carddrive.mousems.me/auth_callback'
-    'scopes'          => ['https://www.googleapis.com/auth/drive.appfolder'],
+    // 'scopes'          => ['https://www.googleapis.com/auth/drive.appfolder'],
+    'scopes'          => ['https://www.googleapis.com/auth/drive'],
     'access_type'     => 'online',
     'approval_prompt' => 'force',
 

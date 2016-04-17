@@ -27,9 +27,7 @@ class GDController extends Controller
     }
 
     public function appfolder_info(){
-
         $appfolder_info = $this->GSDrive->files->get(Session::get('appfolder_id'));
-
         return response()->json($appfolder_info);
     }
 
@@ -91,6 +89,42 @@ class GDController extends Controller
         }
         return Response()->json($return);
     }
+    public function appfolder_sharewithme(){
+        // $about_ref = $this->GSDrive->about->get();
+        // $myemail = $about_ref->getUser()->getEmailAddress();
+
+        $parameters = [
+            "q"=>"sharedWithMe and title contains 'CardDrive_'",
+            "orderBy"=>"sharedWithMeDate desc",
+            "maxResults"=>1000
+        ];
+        $children = $this->GSDrive->files->listFiles($parameters);
+        $return = [];
+        $cache = json_decode($this->read_cache());
+        foreach ($children->getItems() as $key => $child) {
+            $fileID = $child->getId();
+            if (isset($cache->FT->{$fileID})) {
+                if (preg_match("/LastName/",$cache->FT->{$fileID})) {
+                    preg_match("/^CardDrive_(.+)_/",$cache->FT->{$fileID}, $matches);
+                    $return['exist'][$matches[1]]['Name'] = $cache->EN->{$matches[1]};
+                    $return['exist'][$matches[1]]['Id'] = $matches[1];
+                }
+
+            }elseif(isset($cache->ignore)){
+                if (!isset($cache->ignore->{$fileID})) {
+                    if(preg_match('/^CardDrive_(.+)_LastName/',$child->getTitle(),$matchess)){
+                        $return['notexist'][$matchess[1]]['LastName'] = $this->downloadFile($child);
+                        $return['notexist'][$matchess[1]]['Id'] = $matchess[1];
+                    }else if(preg_match('/^CardDrive_(.+)_FirstName/',$child->getTitle(),$matchess)){
+                        $return['notexist'][$matchess[1]]['FirstName'] = $this->downloadFile($child);
+                    }
+                }
+            }
+        }
+
+
+        return Response()->json($return);
+    }
     public function appfolder_deleteall(){
 
         $parameters = [
@@ -105,7 +139,7 @@ class GDController extends Controller
 
     }
 
-    public function read_cache(){
+    public function read_cache($boo_withID=FALSE){
 
         $parameters = [
             "pageToken"=>null,
@@ -114,7 +148,12 @@ class GDController extends Controller
         $children = $this->GSDrive->children->listChildren(Session::get('appfolder_id'), $parameters);
         $return = [];
         foreach ($children->getItems() as $key => $child) {
-            return $this->downloadFileByID($child->getId());
+            if ($boo_withID==TRUE) {
+                $fileID = $child->getId();
+                return [$this->downloadFileByID($fileID),$fileID];
+            }else{
+                return $this->downloadFileByID($child->getId());
+            }
         }
         return null;
     }
@@ -123,7 +162,7 @@ class GDController extends Controller
         return Response()->json($this->GSDrive->files->get($fileID));
     }
     public function downloadFileByID($fileID){
-        return $this->downloadFile($this->GSDrive->files->get($fileID));
+        return urldecode($this->downloadFile($this->GSDrive->files->get($fileID)));
     }
     public function downloadFile($file) {
       $downloadUrl = $file->getDownloadUrl();
@@ -131,7 +170,7 @@ class GDController extends Controller
         $request = new \Google_Http_Request($downloadUrl, 'GET', null, null);
         $httpRequest = $this->GSDrive->getClient()->getAuth()->authenticatedRequest($request);
         if ($httpRequest->getResponseHttpCode() == 200) {
-          return $httpRequest->getResponseBody();
+          return urldecode($httpRequest->getResponseBody());
         } else {
           // An error occurred.
           return null;
@@ -143,7 +182,7 @@ class GDController extends Controller
     }
     public function contact_me(){
         $about_ref = $this->GSDrive->about->get();
-        $email_sha = sha1($about_ref->getUser()->getEmailAddress());
+        $email_sha = md5($about_ref->getUser()->getEmailAddress());
         Session::set('email_sha',$email_sha);
 
         $parameters['q'] = "title contains 'CardDrive_".Session::get('email_sha')."_Cache'";
@@ -200,8 +239,15 @@ class GDController extends Controller
 
     }
     public function contact_data($contact_id){
-        $parameters['q'] = "title contains 'CardDrive_".$contact_id."_' and title!='CardDrive_".$contact_id."_Cache'";
-        $children = $this->GSDrive->children->listChildren(Session::get('appfolder_id'), $parameters);
+        if ($contact_id == "me") {
+            $contact_id = Session::get('email_sha');
+            $parameters['q'] = "title contains 'CardDrive_".$contact_id."_' and title!='CardDrive_".$contact_id."_Cache'";
+            $children = $this->GSDrive->children->listChildren(Session::get('appfolder_id'), $parameters);
+
+        }else{
+            $parameters['q'] = "sharedWithMe and title contains 'CardDrive_".$contact_id."'";
+            $children = $this->GSDrive->files->listFiles($parameters);
+        }
         $MyFilesList = [];
         foreach ($children->getItems() as $key => $child) {
             $MyFilesList[] = $child->getId();
@@ -281,7 +327,8 @@ class GDController extends Controller
                     "TF" => [],
                     "EN" => [
                             Session::get('email_sha')=>$request->input('formFirstName')." ".$request->input('formLastName')
-                    ]
+                    ],
+                    "ignore"=>[]
                 ]
             )
         );
@@ -340,8 +387,8 @@ class GDController extends Controller
             $cache->TF->{"CardDrive_".Session::get('email_sha')."_Cache"},
             Response()->json(
                 [
-                    "FT" => [],
-                    "TF" => [],
+                    "FT" => $cache->FT,
+                    "TF" => $cache->TF,
                     "EN" => [
                             Session::get('email_sha')=>$request->input('formFirstName')." ".$request->input('formLastName')
                     ]
@@ -350,68 +397,125 @@ class GDController extends Controller
         );
         return redirect('/home');
     }
+
+    function ShareFile($fileId, $email, $type="user", $role="reader") {
+      $newPermission = new \Google_Service_Drive_Permission();
+      $newPermission->setValue($email);
+      $newPermission->setType($type);
+      $newPermission->setRole($role);
+      try {
+        return $this->GSDrive->permissions->insert($fileId, $newPermission, array("sendNotificationEmails"=>false));
+      } catch (Exception $e) {
+        print "An error occurred: " . $e->getMessage();
+      }
+      return NULL;
+    }
+
+
     public function share(Request $request){
         $cache = json_decode($this->read_cache());
-
         $email_sha = Session::get('email_sha');
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_LastName",
-            $request->input('formLastName')
+        $this->ShareFile(
+            $cache->TF->{"CardDrive_".$email_sha."_LastName"},
+            $request->input('formToEmail')
+        );
+        $this->ShareFile(
+            $cache->TF->{"CardDrive_".$email_sha."_FirstName"},
+            $request->input('formToEmail')
+        );
+        $this->ShareFile(
+            $cache->TF->{"CardDrive_".$email_sha."_Email_".$request->input('formEmailType')},
+            $request->input('formToEmail')
         );
 
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_FirstName",
-            $request->input('formFirstName')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_Company",
-            $request->input('formCompany')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_Title",
-            $request->input('formTitle')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_Phone_".$request->input('formPhoneType'),
-            $request->input('formPhone')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_Email_".$request->input('formEmailType'),
-            $request->input('formEmail')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_AddressCountry_".$request->input('formAddressType'),
-            $request->input('formAddressCountry')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_AddressZIP_".$request->input('formAddressType'),
-            $request->input('formAddressZIP')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_AddressCity_".$request->input('formAddressType'),
-            $request->input('formAddressCity')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_AddressTownship_".$request->input('formAddressType'),
-            $request->input('formAddressTownship')
-        );
-        $this->appfolder_createfile(
-            "CardDrive_".$email_sha."_AddressStreet_".$request->input('formAddressType'),
-            $request->input('formAddressStreet')
-        );
+        if ($request->input("ShareCompany") == "on") {
+            $this->ShareFile(
+                $cache->TF->{"CardDrive_".$email_sha."_Company"},
+                $request->input('formToEmail')
+            );
+            $this->ShareFile(
+                $cache->TF->{"CardDrive_".$email_sha."_Title"},
+                $request->input('formToEmail')
+            );
+        }
 
-        $this->appfolder_createfile(
-            "CardDrive_".Session::get('email_sha')."_Cache",
-            Response()->json(
-                [
-                    "FT" => [],
-                    "TF" => [],
-                    "EN" => [
-                            Session::get('email_sha')=>$request->input('formFirstName')." ".$request->input('formLastName')
-                    ]
-                ]
-            )
-        );
+        if ($request->input("SharePhone") == "on") {
+            $this->ShareFile(
+                $cache->TF->{"CardDrive_".$email_sha."_Phone_".$request->input('formPhoneType')},
+                $request->input('formToEmail')
+            );
+        }
+
+        if ($request->input("ShareAddress") == "on") {
+            $this->ShareFile(
+                $cache->TF->{"CardDrive_".$email_sha."_AddressCountry_".$request->input('formAddressType')},
+                $request->input('formToEmail')
+            );
+            $this->ShareFile(
+                $cache->TF->{"CardDrive_".$email_sha."_AddressZIP_".$request->input('formAddressType')},
+                $request->input('formToEmail')
+            );
+            $this->ShareFile(
+                $cache->TF->{"CardDrive_".$email_sha."_AddressCity_".$request->input('formAddressType')},
+                $request->input('formToEmail')
+            );
+            $this->ShareFile(
+                $cache->TF->{"CardDrive_".$email_sha."_AddressTownship_".$request->input('formAddressType')},
+                $request->input('formToEmail')
+            );
+            $this->ShareFile(
+                $cache->TF->{"CardDrive_".$email_sha."_AddressStreet_".$request->input('formAddressType')},
+                $request->input('formToEmail')
+            );
+        }
         return redirect('/home');
+    }
+
+    public function contact_accept($contact_id){
+        $parameters = [
+            "q"=>"sharedWithMe and title contains 'CardDrive_".$contact_id."'",
+            "maxResults"=>1000
+        ];
+        $children = $this->GSDrive->files->listFiles($parameters);
+        $return = [];
+        $cachearr = $this->read_cache(TRUE);
+        $cache = json_decode($cachearr[0]);
+        foreach ($children->getItems() as $key => $child) {
+            $fileID = $child->getId();
+            $fileTitle = $child->getTitle();
+            if (preg_match('/_LastName/', $fileTitle)) {
+                $LastName = $this->downloadFile($child);
+            }else if (preg_match('/_FirstName/', $fileTitle)) {
+                $FirstName = $this->downloadFile($child);
+            }else if (preg_match('/_Email/', $fileTitle)) {
+                $Email = $this->downloadFile($child);
+            }
+
+            $cache->TF->{$fileTitle} = $fileID;
+            $cache->FT->{$fileID} = $fileTitle;
+        }
+        $cache->EN->{md5($Email)} = $FirstName." ".$LastName;
+        $this->appfolder_updatefile($cachearr[1], json_encode($cache));
+        return "ok";
+    }
+
+    public function contact_reject($contact_id){
+        $parameters = [
+            "q"=>"sharedWithMe and title contains 'CardDrive_".$contact_id."'",
+            "maxResults"=>1000
+        ];
+        $children = $this->GSDrive->files->listFiles($parameters);
+        $return = [];
+        $cachearr = $this->read_cache(TRUE);
+        $cache = json_decode($cachearr[0]);
+        foreach ($children->getItems() as $key => $child) {
+            $fileID = $child->getId();
+            if (!isset($cache->ignore)) {
+                $cache->ignore = [];
+            }
+            $cache->ignore[$fileID] = date('U');
+        }
+        $this->appfolder_updatefile($cachearr[1], json_encode($cache));
+        return "ok";
     }
 }

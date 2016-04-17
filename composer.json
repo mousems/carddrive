@@ -7,9 +7,9 @@
     "require": {
         "php": ">=5.5.9",
         "laravel/framework": "5.1.*",
-        "google/apiclient": "1.0.*@beta",
+        "google/apiclient": "1.1.*",
         "twbs/bootstrap": "^3.3",
-        "pulkitjalan/google-apiclient": "^2.0",
+        "pulkitjalan/google-apiclient": "2.0.*",
         "barryvdh/laravel-debugbar": "^2.0",
         "jeroendesloovere/vcard": "1.2.*"
 
